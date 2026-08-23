@@ -18,7 +18,7 @@ def main():
             port=5432,
             dbname="payflow",
             user="postgres",
-            password="1408",
+            password="minha_senha",
         ) as conn:
 
             with conn.cursor() as cursor:               
