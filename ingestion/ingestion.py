@@ -4,36 +4,53 @@ import psycopg
 
 current_folder = Path(__file__).parent
 
-FILE_PATH = current_folder.parent / 'data' / 'incoming' / 'transactions_2026-01-01.jsonl'
+
+FOLDER = current_folder.parent / 'data' / 'incoming'
 
 def main():
-    with psycopg.connect(
-        host="localhost",
-        port=5432,
-        dbname="payflow",
-        user="postgres",
-        password="senha",
-    ) as conn:
+    processed_count = 0
+    non_processed_count = 0
+    global_row_count = 0
 
-        with conn.cursor() as cursor:
+    for file_jsonl in sorted(FOLDER.glob("*.jsonl")):
+        with psycopg.connect(
+            host="localhost",
+            port=5432,
+            dbname="payflow",
+            user="postgres",
+            password="1408",
+        ) as conn:
 
-            with FILE_PATH.open("r", encoding="utf-8") as file:
-                file_name = FILE_PATH.name
-                row_count = 0
-                for line in file:
-                    record = json.loads(line)
-                    record["source_file"] = file_name
-                    values = list(record.values())
-                    query = """
-                            INSERT INTO bronze.transactions_raw (transaction_id, transaction_at, transaction_amount, transaction_status, customer_id, customer_name, customer_email, customer_city, customer_state, customer_region, customer_status, merchant_id, merchant_name, merchant_category, merchant_city, merchant_state, merchant_region, merchant_status, payment_method_id, payment_method_name, payment_method_type, payment_method_brand, source_file)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                            """
+            with conn.cursor() as cursor:               
+                file_name = file_jsonl.name
+                cursor.execute("SELECT file_name FROM pipeline.processed_files WHERE file_name = %s", (file_name,))
+                already_processed = cursor.fetchone()
+                if already_processed:
+                    non_processed_count += 1
+                    continue
+                with file_jsonl.open("r", encoding="utf-8") as file:
 
-                    cursor.execute(query, values)
-                    row_count += 1
-                sql = "INSERT INTO pipeline.processed_files (file_name, row_count) VALUES (%s, %s)"
-                cursor.execute(sql, (file_name, row_count))
+                    row_count = 0
+                    for line in file:
+                        record = json.loads(line)
+                        record["source_file"] = file_name
+                        values = list(record.values())
+                        query = """
+                                INSERT INTO bronze.transactions_raw (transaction_id, transaction_at, transaction_amount, transaction_status, customer_id, customer_name, customer_email, customer_city, customer_state, customer_region, customer_status, merchant_id, merchant_name, merchant_category, merchant_city, merchant_state, merchant_region, merchant_status, payment_method_id, payment_method_name, payment_method_type, payment_method_brand, source_file)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                """
 
+                        cursor.execute(query, values)
+                        row_count += 1
+                    sql = "INSERT INTO pipeline.processed_files (file_name, row_count) VALUES (%s, %s)"
+                    cursor.execute(sql, (file_name, row_count))
+                    processed_count += 1
+                    global_row_count += row_count
+
+    print(f"Total files processed: {processed_count}")
+    print(f"Total files not processed: {non_processed_count}")
+    print(f"Total lines processed: {global_row_count}")
+            
         
 
 if __name__ == "__main__":
