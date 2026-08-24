@@ -1,11 +1,22 @@
+import os
 import json
 from pathlib import Path
 import psycopg
+from dotenv import load_dotenv
 
 current_folder = Path(__file__).parent
-
-
 FOLDER = current_folder.parent / 'data' / 'incoming'
+
+load_dotenv(current_folder.parent / ".env")
+
+def get_connection():
+    return psycopg.connect(
+        host=os.getenv("POSTGRES_HOST", "localhost"),
+        port=os.getenv("POSTGRES_PORT", "5432"),
+        dbname=os.getenv("POSTGRES_DB", "payflow"),
+        user=os.getenv("POSTGRES_USER", "postgres"),
+        password=os.getenv("POSTGRES_PASSWORD"),
+    )
 
 def main():
     processed_count = 0
@@ -13,13 +24,7 @@ def main():
     global_row_count = 0
 
     for file_jsonl in sorted(FOLDER.glob("*.jsonl")):
-        with psycopg.connect(
-            host="localhost",
-            port=5432,
-            dbname="payflow",
-            user="postgres",
-            password="minha_senha",
-        ) as conn:
+        with get_connection() as conn:
 
             with conn.cursor() as cursor:               
                 file_name = file_jsonl.name
