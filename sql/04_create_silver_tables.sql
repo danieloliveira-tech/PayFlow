@@ -54,3 +54,8 @@ CREATE TABLE silver.rejected_transactions (
 	source_file			VARCHAR(100),
 	rejection_reason	VARCHAR(100)
 );
+
+CREATE TABLE silver.state_region (
+	state_	VARCHAR(2) PRIMARY KEY,
+	region	VARCHAR(15)
+);
