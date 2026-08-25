@@ -1,5 +1,5 @@
 -- criação da tabela com dados sujos na camada bronze
-CREATE TABLE bronze.transactions_raw (
+CREATE TABLE IF NOT EXISTS bronze.transactions_raw (
 	transaction_id		BIGINT,
 	transaction_at		TIMESTAMPTZ(0),
 	transaction_amount	NUMERIC(15, 2),

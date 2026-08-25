@@ -1,4 +1,4 @@
-CREATE TABLE silver.customers (
+CREATE TABLE IF NOT EXISTS silver.customers (
 	customer_id		BIGINT PRIMARY KEY,
 	customer_name	VARCHAR(100) NOT NULL,
 	customer_email	VARCHAR(150) NOT NULL,
@@ -9,7 +9,7 @@ CREATE TABLE silver.customers (
 	first_seen_at	TIMESTAMPTZ(0) NOT NULL
 );
 
-CREATE TABLE silver.merchants (
+CREATE TABLE IF NOT EXISTS silver.merchants (
 	merchant_id			BIGINT PRIMARY KEY,
 	merchant_name		VARCHAR(100) NOT NULL,
 	merchant_category	VARCHAR(100) NOT NULL,
@@ -20,14 +20,14 @@ CREATE TABLE silver.merchants (
 	first_seen_at		TIMESTAMPTZ(0) NOT NULL
 );
 
-CREATE TABLE silver.payment_methods (
+CREATE TABLE IF NOT EXISTS silver.payment_methods (
 	payment_method_id		BIGINT PRIMARY KEY,
 	payment_method_name		VARCHAR(30) NOT NULL,
 	payment_method_type		VARCHAR(15) NOT NULL,
 	payment_method_brand	VARCHAR(30)
 );
 
-CREATE TABLE silver.transactions (
+CREATE TABLE IF NOT EXISTS silver.transactions (
 	transaction_id		BIGINT PRIMARY KEY,
 	transaction_amount	NUMERIC(15, 2) NOT NULL, CHECK(transaction_amount > 0),
 	transaction_at		TIMESTAMPTZ(0) NOT NULL,
@@ -47,7 +47,7 @@ CREATE TABLE silver.transactions (
 		ON UPDATE CASCADE
 );
 
-CREATE TABLE silver.rejected_transactions (
+CREATE TABLE IF NOT EXISTS silver.rejected_transactions (
 	rejected_id			BIGSERIAL PRIMARY KEY,
 	transaction_id		BIGINT,
 	ingested_at			TIMESTAMPTZ(0),
@@ -55,7 +55,7 @@ CREATE TABLE silver.rejected_transactions (
 	rejection_reason	VARCHAR(100)
 );
 
-CREATE TABLE silver.state_region (
+CREATE TABLE IF NOT EXISTS silver.state_region (
 	state_	VARCHAR(2) PRIMARY KEY,
 	region	VARCHAR(15)
 );

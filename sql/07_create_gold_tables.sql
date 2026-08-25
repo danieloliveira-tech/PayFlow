@@ -1,4 +1,4 @@
-CREATE TABLE gold.dim_datetime (
+CREATE TABLE IF NOT EXISTS gold.dim_datetime (
     datetime_pk         BIGSERIAL PRIMARY KEY,
     full_datetime       TIMESTAMP(0) NOT NULL UNIQUE,
     hour                SMALLINT NOT NULL CHECK (hour BETWEEN 0 AND 23),
@@ -11,7 +11,7 @@ CREATE TABLE gold.dim_datetime (
 );
 
 
-CREATE TABLE gold.dim_payment (
+CREATE TABLE IF NOT EXISTS gold.dim_payment (
     payment_pk              BIGSERIAL PRIMARY KEY,
     payment_method_id       BIGINT NOT NULL UNIQUE,
     payment_method_name     VARCHAR(30) NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE gold.dim_payment (
 );
 
 
-CREATE TABLE gold.dim_merchant (
+CREATE TABLE IF NOT EXISTS gold.dim_merchant (
     merchant_pk         BIGSERIAL PRIMARY KEY,
     merchant_id         BIGINT NOT NULL UNIQUE,
     merchant_name       VARCHAR(100) NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE gold.dim_merchant (
 );
 
 
-CREATE TABLE gold.dim_location (
+CREATE TABLE IF NOT EXISTS gold.dim_location (
     location_pk     BIGSERIAL PRIMARY KEY,
     city            VARCHAR(50) NOT NULL,
     state           VARCHAR(50) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE gold.dim_location (
     UNIQUE (city, state, region)
 );
 
-CREATE TABLE gold.fact_transaction (
+CREATE TABLE IF NOT EXISTS gold.fact_transaction (
     transaction_pk          BIGINT PRIMARY KEY,
     datetime_pk             BIGINT NOT NULL,
     payment_pk              BIGINT NOT NULL,

@@ -25,4 +25,5 @@ VALUES	('AC', 'norte'),
 		('SP', 'sudeste'),
 		('PR', 'sul'),
 		('RS', 'sul'),
-		('SC', 'sul');
+		('SC', 'sul')
+ON CONFLICT (state_) DO NOTHING;
